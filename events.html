@@ -5,15 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Browse, search and register for campus sports events.">
   <title>Explore Sports Events | UniEvent</title>
-   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-  <script defer src="app.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script defer src="js/app.js"></script>
 </head>
 <body>
- <body>
   <header class="topbar">
     <a class="brand" href="index.html">
-      <img class="brand-logo" src="logo.jpg.png" alt="UniEvent logo">
+      <img class="brand-logo" src="images/logo.jpg.png" alt="UniEvent logo" onerror="this.style.display='none'">
       UniEvent
     </a>
     <nav>
@@ -30,16 +29,18 @@
       <h1>Explore sports events</h1>
       <p>Find a game, support your team and get involved in campus sports.</p>
     </div>
+
     <div class="filter-bar">
       <input class="form-control" id="event-search" type="search" placeholder="Search sports events...">
     </div>
+
     <div id="all-events" class="event-grid"></div>
   </main>
 
   <footer class="footer">
     <div class="wrap footer-inner">
       <a class="brand" href="index.html">
-        <img class="brand-logo" src="logo.jpg.png" alt="UniEvent logo">
+        <img class="brand-logo" src="images/logo.jpg.png" alt="UniEvent logo" onerror="this.style.display='none'">
         UniEvent
       </a>
       <span>© 2026 UniEvent · Student project prototype</span>

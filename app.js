@@ -19,7 +19,7 @@ function save(key, value) {
 /* ---------- 2. SEED DATA ---------- */
 const seedEvents = [
   { id: 1, title: "Petanque ", category: "Sports", date: "2026-11-20", time: "7:00", capacity: 200, venue: "Main Field", description: "Take part in a friendly campus petanque tournament.", image: "images/petanque.jpg" },
-  { id: 2, title: "Badminton ", category: "Sports", date: "2026-11-21", time: "10:00", capacity: 40, venue: "Sports Hall", description: "Compete in a friendly badminton tournament open to all students.", image: "images/badminton.jpg" },
+  { id: 2, title: "Badminton ", category: "Sports", date: "2026-11-21", time: "10:00", capacity: 40, venue: "Sports Hall", description: "Compete in a friendly badminton tournament open to all students.", image: "badminton.jpg" },
   { id: 3, title: "Futsal", category: "Sports", date: "2026-11-22", time: "8:30", capacity: 60, venue: "Sports Hall", description: "Cheer on your faculty in our annual futsal tournament.", image: "images/futsal.jpg" },
   { id: 4, title: "Handball", category: "Sports", date: "2026-12-01", time: "09:00", capacity: 300, venue: "Sports Hall", description: "Support your team at the campus handball tournament.", image: "images/handball.jpg" },
   { id: 5, title: "Basketball", category: "Sports", date: "2026-12-02", time: "8:00", capacity: 80, venue: "Sports Hall", description: "Join the student basketball league and cheer on the teams.", image: "images/keranjang.jpg" }

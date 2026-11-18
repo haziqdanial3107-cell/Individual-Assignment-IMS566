@@ -29,10 +29,12 @@ const seedEvents = [
   { id: 4, title: "Handball", category: "Sports", date: "2026-12-01", time: "09:00", capacity: 300, venue: "Sports Hall", description: "Support your team at the campus handball tournament.", image: "images/handball.jpg" },
   { id: 5, title: "Basketball", category: "Sports", date: "2026-12-02", time: "08:00", capacity: 80, venue: "Sports Hall", description: "Join the student basketball league and cheer on the teams.", image: "images/keranjang.jpg" }
 ];
+
 const seedUsers = [
   { id: 1, name: "Admin", email: "admin@univent.edu", password: "admin123", role: "admin" },
   { id: 2, name: "Demo Student", email: "student@univent.edu", password: "student123", role: "student" }
 ];
+
 const demoRegistrations = [
   { id: "demo-reg-1", eventId: 1, userId: "demo-student-aisha", userName: "Aisha Rahman", userEmail: "aisha.demo@example.edu" },
   { id: "demo-reg-2", eventId: 1, userId: "demo-student-daniel", userName: "Daniel Tan", userEmail: "daniel.demo@example.edu" },
@@ -136,7 +138,7 @@ function isSupportedEventImage(source) {
 function eventCard(ev, mode) {
   const s = getSession();
   const left = seatsLeft(ev);
-  const image = isSupportedEventImage(ev.image || "") ? ev.image : "images/logo.jpg.png";
+  const image = isSupportedEventImage(ev.image || "") ? ev.image : "";
   let action = "";
   if (mode === "mine") {
     action = `<button class="btn btn-outline btn-small" data-cancel="${ev.id}">Cancel registration</button>`;
@@ -148,7 +150,8 @@ function eventCard(ev, mode) {
     action = `<button class="btn btn-small" data-register="${ev.id}">Register</button>`;
   }
   return `<article class="event-card">
-    <div class="event-image-wrap"><div class="event-image-placeholder" aria-hidden="true">🏆</div>
+    <div class="event-image-wrap">
+      <div class="event-image-placeholder" aria-hidden="true">🏆</div>
       ${image ? `<img class="event-image" src="${escapeHtml(image)}" alt="Photo for ${escapeHtml(ev.title)}" loading="lazy" onerror="this.hidden=true">` : ""}
     </div>
     <span class="tag">${escapeHtml(ev.category)}</span>
@@ -209,9 +212,9 @@ function initLogin() {
   form.addEventListener("submit", e => {
     e.preventDefault();
     const msg = document.getElementById("form-message");
-    const emailInput = form.querySelector('input[name="email"]');
-    const passInput = form.querySelector('input[name="password"]');
-    const user = login(emailInput.value.trim(), passInput.value);
+    const email = form.querySelector('input[name="email"]').value.trim();
+    const password = form.querySelector('input[name="password"]').value;
+    const user = login(email, password);
     if (!user) { msg.textContent = "Wrong email or password."; msg.className = "form-message error"; return; }
     window.location.href = user.role === "admin" ? "admin-dashboard.html" : "student-dashboard.html";
   });
@@ -223,10 +226,10 @@ function initRegister() {
   form.addEventListener("submit", e => {
     e.preventDefault();
     const msg = document.getElementById("form-message");
-    const nameInput = form.querySelector('input[name="name"]');
-    const emailInput = form.querySelector('input[name="email"]');
-    const passInput = form.querySelector('input[name="password"]');
-    const res = registerUser(nameInput.value.trim(), emailInput.value.trim(), passInput.value);
+    const name = form.querySelector('input[name="name"]').value.trim();
+    const email = form.querySelector('input[name="email"]').value.trim();
+    const password = form.querySelector('input[name="password"]').value;
+    const res = registerUser(name, email, password);
     if (!res.ok) { msg.textContent = res.message; msg.className = "form-message error"; return; }
     msg.textContent = "Account created. Redirecting to login...";
     msg.className = "form-message success";
@@ -298,7 +301,8 @@ function initAdminDashboard() {
   let registrationChart = null, categoryRegistrationChart = null, capacityChart = null;
 
   function drawRegistrationChart(events) {
-    if (!chartCanvas || !window.Chart) return;
+    if (!chartCanvas) return;
+    if (!window.Chart) { chartMessage.textContent = "Chart could not be loaded."; return; }
     const data = {
       labels: events.map(ev => ev.title),
       datasets: [{ label: "Registrations", data: events.map(ev => regsForEvent(ev.id).length), backgroundColor: "rgba(91, 61, 245, 0.75)", borderColor: "#5b3df5", borderWidth: 1, borderRadius: 6 }]
@@ -311,10 +315,11 @@ function initAdminDashboard() {
   }
 
   function drawCategoryRegistrationChart(events) {
-    if (!categoryCanvas || !window.Chart) return;
+    if (!categoryCanvas) return;
     const counts = events.reduce((c, ev) => { c[ev.title] = (c[ev.title] || 0) + regsForEvent(ev.id).length; return c; }, {});
     const titles = Object.keys(counts).filter(t => counts[t] > 0);
     if (!titles.length) { categoryCanvas.parentElement.hidden = true; categoryMessage.textContent = "Event totals will appear after students register."; return; }
+    if (!window.Chart) { categoryCanvas.parentElement.hidden = true; categoryMessage.textContent = "Chart could not be loaded."; return; }
     categoryCanvas.parentElement.hidden = false;
     categoryMessage.textContent = "";
     const data = {
@@ -329,8 +334,9 @@ function initAdminDashboard() {
   }
 
   function drawCapacityChart(events) {
-    if (!capacityCanvas || !window.Chart) return;
+    if (!capacityCanvas) return;
     if (!events.length) { capacityCanvas.parentElement.hidden = true; return; }
+    if (!window.Chart) { capacityCanvas.parentElement.hidden = true; return; }
     capacityCanvas.parentElement.hidden = false;
     const data = {
       labels: events.map(ev => ev.title),

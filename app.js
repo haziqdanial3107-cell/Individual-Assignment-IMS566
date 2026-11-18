@@ -1,7 +1,8 @@
-
-
 /* ---------- 1. STORAGE HELPERS ---------- */
-const KEYS = { users: "ue_users", events: "ue_events", regs: "ue_regs", session: "ue_session", demoRegsSeeded: "ue_demo_regs_seeded" };
+const KEYS = {
+  users: "ue_users", events: "ue_events", regs: "ue_regs",
+  session: "ue_session", demoRegsSeeded: "ue_demo_regs_seeded"
+};
 
 function load(key, fallback) {
   try {
@@ -13,32 +14,21 @@ function load(key, fallback) {
   }
 }
 function save(key, value) {
-  localStorage.setItem(key, JSON.stringify(value));
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch (err) {
+    console.error("Could not save", key, err);
+  }
 }
 
 /* ---------- 2. SEED DATA ---------- */
 const seedEvents = [
-  { id: 1, title: "Petanque ", category: "Sports", date: "2026-11-20", time: "7:00", capacity: 200, venue: "Main Field", description: "Take part in a friendly campus petanque tournament.", image: "images/petanque.jpg" },
-  { id: 2, title: "Badminton ", category: "Sports", date: "2026-11-21", time: "10:00", capacity: 40, venue: "Sports Hall", description: "Compete in a friendly badminton tournament open to all students.", image: "badminton.jpg" },
-  { id: 3, title: "Futsal", category: "Sports", date: "2026-11-22", time: "8:30", capacity: 60, venue: "Sports Hall", description: "Cheer on your faculty in our annual futsal tournament.", image: "images/futsal.jpg" },
+  { id: 1, title: "Petanque", category: "Sports", date: "2026-11-20", time: "07:00", capacity: 200, venue: "Main Field", description: "Take part in a friendly campus petanque tournament.", image: "images/petanque.jpg" },
+  { id: 2, title: "Badminton", category: "Sports", date: "2026-11-21", time: "10:00", capacity: 40, venue: "Sports Hall", description: "Compete in a friendly badminton tournament open to all students.", image: "images/badminton.jpg" },
+  { id: 3, title: "Futsal", category: "Sports", date: "2026-11-22", time: "08:30", capacity: 60, venue: "Sports Hall", description: "Cheer on your faculty in our annual futsal tournament.", image: "images/futsal.jpg" },
   { id: 4, title: "Handball", category: "Sports", date: "2026-12-01", time: "09:00", capacity: 300, venue: "Sports Hall", description: "Support your team at the campus handball tournament.", image: "images/handball.jpg" },
-  { id: 5, title: "Basketball", category: "Sports", date: "2026-12-02", time: "8:00", capacity: 80, venue: "Sports Hall", description: "Join the student basketball league and cheer on the teams.", image: "images/keranjang.jpg" }
+  { id: 5, title: "Basketball", category: "Sports", date: "2026-12-02", time: "08:00", capacity: 80, venue: "Sports Hall", description: "Join the student basketball league and cheer on the teams.", image: "images/keranjang.jpg" }
 ];
-const legacySeedEventTitles = {
-  1: "Campus Activities",
-  2: "Campus Activities",
-  3: "Campus Activities",
-  4: "Campus Activities",
-  5: "Campus Activities"
-};
-const legacySeedImageUrls = {
-  1: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=900&q=80",
-  2: "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=900&q=80",
-  3: "https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&w=900&q=80",
-  4: "https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=900&q=80",
-  5: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=900&q=80"
-};
-const categoryImages = { Sports: seedEvents[2].image };
 const seedUsers = [
   { id: 1, name: "Admin", email: "admin@univent.edu", password: "admin123", role: "admin" },
   { id: 2, name: "Demo Student", email: "student@univent.edu", password: "student123", role: "student" }
@@ -65,25 +55,6 @@ function seedData() {
   if (!localStorage.getItem(KEYS.events)) save(KEYS.events, seedEvents);
   if (!localStorage.getItem(KEYS.users)) save(KEYS.users, seedUsers);
   if (!localStorage.getItem(KEYS.regs)) save(KEYS.regs, []);
-  const events = getEvents();
-  let eventsUpdated = false;
-  const updatedEvents = events.map(event => {
-    const seed = seedEvents.find(item => item.id === event.id);
-    if (seed && legacySeedEventTitles[event.id] === event.title) {
-      eventsUpdated = true;
-      return { ...event, ...seed };
-    }
-    const updatedEvent = { ...event };
-    if (seed && (!event.image || event.image === legacySeedImageUrls[event.id])) {
-      updatedEvent.image = seed.image;
-    }
-    if (updatedEvent.category !== "Sports") {
-      updatedEvent.category = "Sports";
-    }
-    if (updatedEvent.image !== event.image || updatedEvent.category !== event.category) eventsUpdated = true;
-    return updatedEvent;
-  });
-  if (eventsUpdated) save(KEYS.events, updatedEvents);
   if (!localStorage.getItem(KEYS.demoRegsSeeded)) {
     const regs = getRegs();
     const existingIds = new Set(regs.map(reg => reg.id));
@@ -116,7 +87,6 @@ function registerUser(name, email, password) {
   save(KEYS.users, users);
   return { ok: true };
 }
-/* Redirect people who are not allowed on a page */
 function requireRole(role) {
   const s = getSession();
   if (!s || (role && s.role !== role)) {
@@ -139,8 +109,8 @@ function registerForEvent(eventId) {
   if (s.role !== "student") { alert("Only student accounts can register."); return; }
   const ev = getEvents().find(e => e.id === eventId);
   if (!ev) return;
-  if (isRegistered(eventId, s.id)) { alert("You are already registered.Thankyou for your interest."); return; }
-  if (seatsLeft(ev) === 0) { alert("Sorry, this event is full.You can try again next time."); return; }
+  if (isRegistered(eventId, s.id)) { alert("You are already registered. Thank you for your interest."); return; }
+  if (seatsLeft(ev) === 0) { alert("Sorry, this event is full. You can try again next time."); return; }
   const regs = getRegs();
   regs.push({ id: Date.now(), eventId, userId: s.id, userName: s.name, userEmail: s.email });
   save(KEYS.regs, regs);
@@ -166,9 +136,7 @@ function isSupportedEventImage(source) {
 function eventCard(ev, mode) {
   const s = getSession();
   const left = seatsLeft(ev);
-  const image = isSupportedEventImage(ev.image || "")
-    ? ev.image
-    : categoryImages[ev.category];
+  const image = isSupportedEventImage(ev.image || "") ? ev.image : "images/logo.jpg.png";
   let action = "";
   if (mode === "mine") {
     action = `<button class="btn btn-outline btn-small" data-cancel="${ev.id}">Cancel registration</button>`;
@@ -180,8 +148,8 @@ function eventCard(ev, mode) {
     action = `<button class="btn btn-small" data-register="${ev.id}">Register</button>`;
   }
   return `<article class="event-card">
-    <div class="event-image-wrap"><div class="event-image-placeholder" aria-hidden="true">🎉</div>
-      ${image ? `<img class="event-image" src="${escapeHtml(image)}" alt="Photo for ${escapeHtml(ev.title)}" loading="lazy">` : ""}
+    <div class="event-image-wrap"><div class="event-image-placeholder" aria-hidden="true">🏆</div>
+      ${image ? `<img class="event-image" src="${escapeHtml(image)}" alt="Photo for ${escapeHtml(ev.title)}" loading="lazy" onerror="this.hidden=true">` : ""}
     </div>
     <span class="tag">${escapeHtml(ev.category)}</span>
     <h3>${escapeHtml(ev.title)}</h3>
@@ -200,11 +168,7 @@ function renderList(container, events, mode, emptyText) {
   container.innerHTML = events.length
     ? events.map(e => eventCard(e, mode)).join("")
     : `<p class="empty">${emptyText}</p>`;
-  container.querySelectorAll(".event-image").forEach(image => {
-    image.addEventListener("error", () => { image.hidden = true; });
-  });
 }
-/* One click handler for all register / cancel buttons */
 function bindCardButtons(refresh) {
   document.addEventListener("click", e => {
     const reg = e.target.closest("[data-register]");
@@ -245,7 +209,9 @@ function initLogin() {
   form.addEventListener("submit", e => {
     e.preventDefault();
     const msg = document.getElementById("form-message");
-    const user = login(form.email.value.trim(), form.password.value);
+    const emailInput = form.querySelector('input[name="email"]');
+    const passInput = form.querySelector('input[name="password"]');
+    const user = login(emailInput.value.trim(), passInput.value);
     if (!user) { msg.textContent = "Wrong email or password."; msg.className = "form-message error"; return; }
     window.location.href = user.role === "admin" ? "admin-dashboard.html" : "student-dashboard.html";
   });
@@ -257,7 +223,10 @@ function initRegister() {
   form.addEventListener("submit", e => {
     e.preventDefault();
     const msg = document.getElementById("form-message");
-    const res = registerUser(form.elements.namedItem("name").value.trim(), form.email.value.trim(), form.password.value);
+    const nameInput = form.querySelector('input[name="name"]');
+    const emailInput = form.querySelector('input[name="email"]');
+    const passInput = form.querySelector('input[name="password"]');
+    const res = registerUser(nameInput.value.trim(), emailInput.value.trim(), passInput.value);
     if (!res.ok) { msg.textContent = res.message; msg.className = "form-message error"; return; }
     msg.textContent = "Account created. Redirecting to login...";
     msg.className = "form-message success";
@@ -278,47 +247,26 @@ function initStudentDashboard() {
   function drawCategoryChart(events) {
     if (!chartCanvas) return;
     if (!events.length) {
-      chartCanvas.hidden = true;
       chartCanvas.parentElement.hidden = true;
       chartMessage.textContent = "Register for a sport event to see your breakdown.";
-      chartMessage.className = "form-message muted";
       return;
     }
     if (!window.Chart) {
-      chartCanvas.hidden = true;
       chartCanvas.parentElement.hidden = true;
       chartMessage.textContent = "Your sport event chart could not be loaded.";
-      chartMessage.className = "form-message error";
       return;
     }
-
-    chartCanvas.hidden = false;
     chartCanvas.parentElement.hidden = false;
     chartMessage.textContent = "";
-    const counts = events.reduce((totals, ev) => {
-      totals[ev.title] = (totals[ev.title] || 0) + 1;
-      return totals;
-    }, {});
+    const counts = events.reduce((t, ev) => { t[ev.title] = (t[ev.title] || 0) + 1; return t; }, {});
     const data = {
       labels: Object.keys(counts),
-      datasets: [{
-        data: Object.values(counts),
-        backgroundColor: ["#5b3df5", "#ff6b8b", "#2bb3a3", "#f0a43c", "#5887e8"]
-      }]
+      datasets: [{ data: Object.values(counts), backgroundColor: ["#5b3df5", "#ff6b8b", "#2bb3a3", "#f0a43c", "#5887e8"] }]
     };
-    if (categoryChart) {
-      categoryChart.data = data;
-      categoryChart.update();
-      return;
-    }
+    if (categoryChart) { categoryChart.data = data; categoryChart.update(); return; }
     categoryChart = new Chart(chartCanvas, {
-      type: "doughnut",
-      data,
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { position: "bottom" } }
-      }
+      type: "doughnut", data,
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "bottom" } } }
     });
   }
 
@@ -347,112 +295,43 @@ function initAdminDashboard() {
   const categoryMessage = document.getElementById("admin-category-chart-message");
   const capacityCanvas = document.getElementById("capacity-chart");
   const capacityMessage = document.getElementById("capacity-chart-message");
-  let registrationChart = null;
-  let categoryRegistrationChart = null;
-  let capacityChart = null;
+  let registrationChart = null, categoryRegistrationChart = null, capacityChart = null;
 
   function drawRegistrationChart(events) {
-    if (!chartCanvas) return;
-    if (!window.Chart) {
-      chartMessage.textContent = "The registration chart could not be loaded.";
-      chartMessage.className = "form-message error";
-      return;
-    }
-
+    if (!chartCanvas || !window.Chart) return;
     const data = {
       labels: events.map(ev => ev.title),
-      datasets: [{
-        label: "Registrations",
-        data: events.map(ev => regsForEvent(ev.id).length),
-        backgroundColor: "rgba(91, 61, 245, 0.75)",
-        borderColor: "#5b3df5",
-        borderWidth: 1,
-        borderRadius: 6
-      }]
+      datasets: [{ label: "Registrations", data: events.map(ev => regsForEvent(ev.id).length), backgroundColor: "rgba(91, 61, 245, 0.75)", borderColor: "#5b3df5", borderWidth: 1, borderRadius: 6 }]
     };
-    if (registrationChart) {
-      registrationChart.data = data;
-      registrationChart.update();
-      return;
-    }
+    if (registrationChart) { registrationChart.data = data; registrationChart.update(); return; }
     registrationChart = new Chart(chartCanvas, {
-      type: "bar",
-      data,
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          y: { beginAtZero: true, ticks: { precision: 0 }, title: { display: true, text: "Students registered" } },
-          x: { ticks: { autoSkip: false } }
-        }
-      }
+      type: "bar", data,
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { ticks: { autoSkip: false } } } }
     });
   }
 
   function drawCategoryRegistrationChart(events) {
-    if (!categoryCanvas) return;
-    const categoryCounts = events.reduce((counts, ev) => {
-      counts[ev.title] = (counts[ev.title] || 0) + regsForEvent(ev.id).length;
-      return counts;
-    }, {});
-    const sportEvents = Object.keys(categoryCounts).filter(title => categoryCounts[title] > 0);
-    if (!sportEvents.length) {
-      categoryCanvas.parentElement.hidden = true;
-      categoryMessage.textContent = "Event totals will appear after students register.";
-      categoryMessage.className = "form-message muted";
-      return;
-    }
-    if (!window.Chart) {
-      categoryCanvas.parentElement.hidden = true;
-      categoryMessage.textContent = "The sport event chart could not be loaded.";
-      categoryMessage.className = "form-message error";
-      return;
-    }
-
+    if (!categoryCanvas || !window.Chart) return;
+    const counts = events.reduce((c, ev) => { c[ev.title] = (c[ev.title] || 0) + regsForEvent(ev.id).length; return c; }, {});
+    const titles = Object.keys(counts).filter(t => counts[t] > 0);
+    if (!titles.length) { categoryCanvas.parentElement.hidden = true; categoryMessage.textContent = "Event totals will appear after students register."; return; }
     categoryCanvas.parentElement.hidden = false;
     categoryMessage.textContent = "";
     const data = {
-      labels: sportEvents,
-      datasets: [{
-        label: "Registrations",
-        data: sportEvents.map(title => categoryCounts[title]),
-        backgroundColor: ["#5b05f0", "#e6f109", "#eefaff", "#f0a43c", "#5887e8"]
-      }]
+      labels: titles,
+      datasets: [{ label: "Registrations", data: titles.map(t => counts[t]), backgroundColor: ["#5b3df5", "#ff6b8b", "#2bb3a3", "#f0a43c", "#5887e8"] }]
     };
-    if (categoryRegistrationChart) {
-      categoryRegistrationChart.data = data;
-      categoryRegistrationChart.update();
-      return;
-    }
+    if (categoryRegistrationChart) { categoryRegistrationChart.data = data; categoryRegistrationChart.update(); return; }
     categoryRegistrationChart = new Chart(categoryCanvas, {
-      type: "doughnut",
-      data,
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { position: "bottom" } }
-      }
+      type: "doughnut", data,
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "bottom" } } }
     });
   }
 
   function drawCapacityChart(events) {
-    if (!capacityCanvas) return;
-    if (!events.length) {
-      capacityCanvas.parentElement.hidden = true;
-      capacityMessage.textContent = "Add an event to see seat availability.";
-      capacityMessage.className = "form-message muted";
-      return;
-    }
-    if (!window.Chart) {
-      capacityCanvas.parentElement.hidden = true;
-      capacityMessage.textContent = "The seat availability chart could not be loaded.";
-      capacityMessage.className = "form-message error";
-      return;
-    }
-
+    if (!capacityCanvas || !window.Chart) return;
+    if (!events.length) { capacityCanvas.parentElement.hidden = true; return; }
     capacityCanvas.parentElement.hidden = false;
-    capacityMessage.textContent = "";
     const data = {
       labels: events.map(ev => ev.title),
       datasets: [
@@ -460,22 +339,10 @@ function initAdminDashboard() {
         { label: "Available seats", data: events.map(ev => seatsLeft(ev)), backgroundColor: "#d8d1ff" }
       ]
     };
-    if (capacityChart) {
-      capacityChart.data = data;
-      capacityChart.update();
-      return;
-    }
+    if (capacityChart) { capacityChart.data = data; capacityChart.update(); return; }
     capacityChart = new Chart(capacityCanvas, {
-      type: "bar",
-      data,
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          x: { stacked: true, ticks: { autoSkip: false } },
-          y: { stacked: true, beginAtZero: true, ticks: { precision: 0 }, title: { display: true, text: "Seats" } }
-        }
-      }
+      type: "bar", data,
+      options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true, ticks: { autoSkip: false } }, y: { stacked: true, beginAtZero: true, ticks: { precision: 0 } } } }
     });
   }
 
@@ -499,15 +366,12 @@ function initAdminDashboard() {
     document.getElementById("participant-overview").innerHTML = events.map(ev => {
       const people = regsForEvent(ev.id);
       return `<div class="participant-group"><h3>${escapeHtml(ev.title)} <span class="tag">${people.length}/${ev.capacity}</span></h3>` +
-        (people.length
-          ? `<ul>${people.map(p => `<li>${escapeHtml(p.userName)} <small class="muted">${escapeHtml(p.userEmail)}</small></li>`).join("")}</ul>`
-          : `<p class="muted">No registrations yet.</p>`) + `</div>`;
+        (people.length ? `<ul>${people.map(p => `<li>${escapeHtml(p.userName)} <small class="muted">${escapeHtml(p.userEmail)}</small></li>`).join("")}</ul>` : `<p class="muted">No registrations yet.</p>`) + `</div>`;
     }).join("");
   }
 
   function resetForm() {
-    form.reset(); form.id.value = "";
-    form.capacity.value = 50;
+    form.reset(); form.id.value = ""; form.capacity.value = 50;
     title.textContent = "Add a new event";
   }
 
@@ -516,15 +380,14 @@ function initAdminDashboard() {
     const events = getEvents();
     const image = form.image.value.trim();
     if (image && !isSupportedEventImage(image)) {
-      msg.textContent = "Enter an http(s) image URL or a file path under images/ .";
+      msg.textContent = "Enter an http(s) image URL or a file path under images/.";
       msg.className = "form-message error";
       return;
     }
     const data = {
       title: form.title.value.trim(), category: "Sports", date: form.date.value,
       time: form.time.value, capacity: Number(form.capacity.value),
-      venue: form.venue.value.trim(), description: form.description.value.trim(),
-      image
+      venue: form.venue.value.trim(), description: form.description.value.trim(), image
     };
     const editingId = Number(form.elements["id"].value);
     if (editingId) {

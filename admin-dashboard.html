@@ -5,19 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Manage UniEvent campus events, registrations and attendance.">
   <title>Admin Dashboard | UniEvent</title>
-
-  <!-- Bootstrap 5 -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Project styles -->
-  <link rel="stylesheet" href="style.css">
-
-  <!-- Chart.js + App script (defer supaya turutan betul) -->
+  <link rel="stylesheet" href="css/style.css">
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script defer src="js/app.js"></script>
 </head>
 <body>
-
-  <!-- ================= HEADER ================= -->
   <header class="topbar">
     <a class="brand" href="index.html">
       <img class="brand-logo" src="images/logo.jpg.png" alt="UniEvent logo" onerror="this.style.display='none'">
@@ -31,10 +24,7 @@
     </nav>
   </header>
 
-  <!-- ================= MAIN ================= -->
   <main class="wrap page-main">
-
-    <!-- Page heading -->
     <div class="dashboard-heading">
       <div>
         <span class="eyebrow">ADMINISTRATION</span>
@@ -43,26 +33,12 @@
       </div>
     </div>
 
-    <!-- Metric cards -->
     <div class="metric-grid three">
-      <div class="metric">
-        <span>Total events</span>
-        <b id="admin-event-count">0</b>
-        <small>Published events</small>
-      </div>
-      <div class="metric">
-        <span>Total registrations</span>
-        <b id="admin-reg-count">0</b>
-        <small>Across all events</small>
-      </div>
-      <div class="metric">
-        <span>Available seats</span>
-        <b id="admin-seat-count">0</b>
-        <small>Remaining capacity</small>
-      </div>
+      <div class="metric"><span>Total events</span><b id="admin-event-count">0</b><small>Published events</small></div>
+      <div class="metric"><span>Total registrations</span><b id="admin-reg-count">0</b><small>Across all events</small></div>
+      <div class="metric"><span>Available seats</span><b id="admin-seat-count">0</b><small>Remaining capacity</small></div>
     </div>
 
-    <!-- Registrations bar chart -->
     <section class="panel chart-panel" aria-labelledby="registration-chart-heading">
       <span class="eyebrow">EVENT ENGAGEMENT</span>
       <h2 id="registration-chart-heading">Registrations by event</h2>
@@ -73,10 +49,7 @@
       <p id="chart-message" class="form-message" role="status"></p>
     </section>
 
-    <!-- Two charts side-by-side -->
     <section class="chart-grid" aria-label="Sport and capacity visualizations">
-
-      <!-- Doughnut: registrations by sport -->
       <article class="panel chart-panel" aria-labelledby="admin-category-chart-heading">
         <span class="eyebrow">SPORT BREAKDOWN</span>
         <h2 id="admin-category-chart-heading">Registrations by sport event</h2>
@@ -86,8 +59,6 @@
         </div>
         <p id="admin-category-chart-message" class="form-message muted" role="status"></p>
       </article>
-
-      <!-- Stacked bar: registered vs available -->
       <article class="panel chart-panel" aria-labelledby="capacity-chart-heading">
         <span class="eyebrow">SEAT AVAILABILITY</span>
         <h2 id="capacity-chart-heading">Registered vs available seats</h2>
@@ -97,88 +68,53 @@
         </div>
         <p id="capacity-chart-message" class="form-message muted" role="status"></p>
       </article>
-
     </section>
 
-    <!-- Admin editor + current listings -->
     <section class="admin-layout">
-
-      <!-- Event editor -->
       <div class="panel">
         <div class="section-heading">
-          <div>
-            <span class="eyebrow">EVENT EDITOR</span>
-            <h2 id="event-form-title">Add a new event</h2>
-          </div>
+          <div><span class="eyebrow">EVENT EDITOR</span><h2 id="event-form-title">Add a new event</h2></div>
         </div>
-
         <form id="event-form" class="admin-form">
           <input type="hidden" name="id">
-
-          <label>Event title
-            <input class="form-control" name="title" required placeholder="e.g. Campus Badminton Tournament">
-          </label>
-
+          <label>Event title<input class="form-control" name="title" required placeholder="e.g. Campus Badminton Tournament"></label>
           <div class="form-row">
-            <label>Sport
-              <input class="form-control" name="category" value="Sports" readonly>
-            </label>
-            <label>Date
-              <input class="form-control" name="date" type="date" required>
-            </label>
+            <label>Sport<input class="form-control" name="category" value="Sports" readonly></label>
+            <label>Date<input class="form-control" name="date" type="date" required></label>
           </div>
-
           <div class="form-row">
-            <label>Time
-              <input class="form-control" name="time" type="time" required>
-            </label>
-            <label>Capacity
-              <input class="form-control" name="capacity" type="number" min="1" required value="50">
-            </label>
+            <label>Time<input class="form-control" name="time" type="time" required></label>
+            <label>Capacity<input class="form-control" name="capacity" type="number" min="1" required value="50"></label>
           </div>
-
-          <label>Venue
-            <input class="form-control" name="venue" required placeholder="e.g. Sports Hall">
-          </label>
-
-          <label>Description
-            <textarea class="form-control" name="description" rows="3" required placeholder="Tell students about this event..."></textarea>
-          </label>
-
+          <label>Venue<input class="form-control" name="venue" required placeholder="e.g. Sports Hall"></label>
+          <label>Description<textarea class="form-control" name="description" rows="3" required placeholder="Tell students about this event..."></textarea></label>
           <label>Photo source <span class="muted">(optional)</span>
             <input class="form-control" name="image" type="text" placeholder="images/event-photo.jpg or https://...">
             <small class="muted">Save local photos in the project's images folder, then enter their relative path.</small>
           </label>
-
           <div class="form-row">
             <button class="btn" type="submit">Save event</button>
             <button class="btn btn-outline" type="reset" id="reset-event">Clear form</button>
           </div>
-
           <p id="admin-message" class="form-message"></p>
         </form>
       </div>
 
-      <!-- Current listings -->
       <div class="panel">
         <span class="eyebrow">CURRENT LISTINGS</span>
         <h2>Manage events</h2>
         <div id="admin-events" class="admin-event-list"></div>
       </div>
-
     </section>
 
-    <!-- Attendance overview -->
     <section class="panel participants-panel">
       <span class="eyebrow">ATTENDANCE</span>
       <h2>Registration overview</h2>
       <p class="muted">Includes sample demo attendees; real students are not affected.</p>
       <div id="participant-overview" class="participant-overview-grid"></div>
     </section>
-
   </main>
 
-  <!-- ================= FOOTER ================= -->
   <footer class="footer">
     <div class="wrap footer-inner">
       <a class="brand" href="index.html">
@@ -188,6 +124,5 @@
       <span>© 2026 UniEvent · Student project prototype</span>
     </div>
   </footer>
-
 </body>
 </html>
